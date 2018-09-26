@@ -1,0 +1,86 @@
+{% include 'header_new.html' %}	
+
+<div class="container-fluid">
+    <div class="row">
+			
+		{% if error: %}			
+		<div class="col-lg-12">
+			<div class="alert alert-danger alert-dismissible fade in">
+				<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+				<strong>Danger!</strong> 	{% for item in error %}
+				{% for s_key,s_value in item.items() %}
+				<b>  {{s_key}}</b> : {{s_value}}<br>
+				{% endfor %}				
+				{% endfor %}
+			</div>		
+		</div>	
+		{% endif %}	
+
+		{% if input_success: %}			
+		<div class="col-lg-12">
+			<div class="alert alert-success alert-dismissible fade in">
+				<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+				<strong>Success!</strong> 	{{input_success}}
+			</div>		
+		</div>	
+		{% endif %}	
+
+		{% if user_message: %}			
+		<div class="col-lg-12">
+			<div class="alert alert-danger alert-dismissible fade in">
+				<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+				<strong>Info! </strong> 	{{user_message}}
+			</div>		
+		</div>	
+		{% endif %}			
+				
+
+	{% if file_list %}			
+	<div class="col-lg-12">
+	<div class="panel panel-primary">
+		<div class="panel-heading">Existing Backup Data</div>
+		<div class="panel-body">
+		<form  action="/test-area-remove" method="get">
+			<table class="table table-bordered" id='ri-score-list-table'>							
+				<thead>								
+				<tr>
+					<th>File Name</th>
+				</tr>
+				</thead>					
+				<tbody>							
+				{% for item in file_list %}
+					<tr>
+						<td>{{item}}</td>
+					</tr>
+				{% endfor %}
+				</tbody>								
+			</table>				
+		</form>
+		</div>
+	</div>
+	</div>	
+	{% endif %}	 
+				
+			</div>	
+            <!-- /.row -->
+        </div>
+        <!-- /#page-wrapper -->
+		
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>	
+<script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+<script>
+
+
+$(document).ready(function() {
+
+	$('#ri-score-list-table').DataTable({  "columns": [
+    { "width": "18%" },
+    { "width": "18%"},
+    { "width": "18%"},
+    { "width": "18%"},
+    { "width": "18%"}
+  ]});
+} );	
+</script>		
+		
+{% include 'footer_new.html' %}	

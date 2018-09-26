@@ -1,0 +1,158 @@
+{% include 'header_new.html' %}	
+
+<div class="container-fluid">
+    <div class="row">
+			
+		{% if error: %}			
+		<div class="col-lg-12">
+			<div class="alert alert-danger alert-dismissible fade in">
+				<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+				<strong>Danger!</strong> 	{% for item in error %}
+				{% for s_key,s_value in item.items() %}
+				<b>  {{s_key}}</b> : {{s_value}}<br>
+				{% endfor %}				
+				{% endfor %}
+			</div>		
+		</div>	
+		{% endif %}	
+
+		{% if input_success: %}			
+		<div class="col-lg-12">
+			<div class="alert alert-success alert-dismissible fade in">
+				<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+				<strong>Success!</strong> 	{{input_success}}
+			</div>		
+		</div>	
+		{% endif %}	
+
+		{% if user_message: %}			
+		<div class="col-lg-12">
+			<div class="alert alert-danger alert-dismissible fade in">
+				<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+				<strong>Info! </strong> 	{{user_message}}
+			</div>		
+		</div>	
+		{% endif %}					
+			
+		<!--	
+		<div class="col-lg-12">
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					Add New Test Area
+				</div>
+				<div class="panel-body">
+						
+						
+				<form  action="/test-area-management" method="post">
+
+					<div class="col-md-12 text-left" style="padding-bottom:10px;">
+					  <label for="cafy_link">Test Area*:</label>
+					  <div>          
+						<input class="form-control" id="test_area" name="test_area" value="" placeholder="Enter Your Test Area" required>
+					  </div>				
+					</div>
+
+					<div class="col-md-2 text-left" style="padding-bottom:10px;">
+					  <label for="user_id">Username*:</label>
+					  <div>          
+						<input type="text" class="form-control" id="user_id" name="user_id" value="{{loggedin_user}}" placeholder="CEC Id" readonly>
+					  </div>				
+					</div>			
+					
+					<div class="col-md-6 text-left" style="padding-bottom:10px;">        
+					  <div style="padding-top:25px;">
+						<button type="submit" id="add_result_submit" onClick="return validateTestareaForm();" class="btn btn-success">Submit</button>
+						<span style="margin: 0px; padding: 0px; background: #ffffff; color: #e74c3c; box-shadow: 0px 0px; border: 0px solid #e74c3c;"><b><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Note: </b> All the fields marked as (*) are mandatory </span>						
+					  </div>	  
+					</div>					
+					
+				</form>					
+						
+						
+				</div>
+			</div>
+		</div>			
+		-->		
+
+	{% if loan_int_list %}			
+	<div class="col-lg-12">
+	<div class="panel panel-primary">
+		<div class="panel-heading">Existing test areas</div>
+		<div class="panel-body">
+		<form  action="/test-area-remove" method="get">
+			<table class="table table-bordered" id='test-area-list-table'>							
+				<thead>								
+				<tr>
+					<th>Bank Issuer</th>
+					<th>Princi O/S</th>					
+					<th>ROI</th>
+					<th>Int to be paid</th>
+					<!--
+					<th>Edit</th>
+					<th>Trash</th>	-->								
+				</tr>
+				</thead>					
+				<tbody>							
+				{% for item in loan_int_list %}
+				<tr>
+					<td>{{item.issuer}}</td>
+					<td>{{item.p_os}}</td>					
+					<td>{{item.roi}}</td>
+					<td>{{item.int_for_next_month}}</td>
+					<!--
+					<td><a class='btn btn-success btn-sm' title='Edit' href="test-area-edit?tid={{item['_id']}}"><span class='glyphicon glyphicon-edit' ></span></a></td>									
+					{% if item.used_status == 0:%}
+					<td><a class='btn btn-danger btn-sm' title='Delete' href="test-area-remove?tid={{item['_id']}}"><span class='glyphicon glyphicon-trash' ></span></a></td>		
+					{% else %}
+					<td>&nbsp;</td>
+					{% endif %}
+					-->	
+				</tr>						
+				{% endfor %}
+				<tr>
+					<td>&nbsp;</td>
+					<td>{{p_os_total}}</td>					
+					<td>&nbsp;</td>
+					<td>{{int_month_total}}</td>
+				</tr>				
+			</table>				
+		</form>
+		</div>
+	</div>
+	</div>	
+	{% endif %}	 
+				
+			</div>	
+            <!-- /.row -->
+        </div>
+        <!-- /#page-wrapper -->
+		
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>	
+<script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+<script>
+function validateTestareaForm() {
+
+	var test_area = document.getElementsByName('test_area')[0].value;
+	var user_id = document.getElementsByName('user_id')[0].value;
+	
+    if(test_area.trim()!="" && user_id.trim()!="") {
+		return true;
+    }else{
+	    alert("Please fill mandatory fields.")
+        document.getElementById('test_area').style.borderColor="#FF5733";
+		return false;	
+	}
+}
+
+
+$(document).ready(function() {
+
+	$('#test-area-list-table').DataTable({  "columns": [
+    { "width": "90%" },
+    { "width": "5%","orderable": false },
+    { "width": "5%","orderable": false }
+  ]});
+} );	
+</script>		
+		
+{% include 'footer_new.html' %}		

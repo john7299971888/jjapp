@@ -1,0 +1,112 @@
+{% include 'header_new.html' %}	
+
+<div class="container-fluid">
+    <div class="row">
+			
+		{% if error: %}			
+		<div class="col-lg-12">
+			<div class="alert alert-danger alert-dismissible fade in">
+				<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+				<strong>Danger!</strong> 	{% for item in error %}
+				{% for s_key,s_value in item.items() %}
+				<b>  {{s_key}}</b> : {{s_value}}<br>
+				{% endfor %}				
+				{% endfor %}
+			</div>		
+		</div>	
+		{% endif %}	
+
+		{% if input_success: %}			
+		<div class="col-lg-12">
+			<div class="alert alert-success alert-dismissible fade in">
+				<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+				<strong>Success!</strong> 	{{input_success}}
+			</div>		
+		</div>	
+		{% endif %}	
+
+		{% if user_message: %}			
+		<div class="col-lg-12">
+			<div class="alert alert-danger alert-dismissible fade in">
+				<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+				<strong>Info! </strong> 	{{user_message}}
+			</div>		
+		</div>	
+		{% endif %}			
+				
+
+	<div class="col-lg-12">
+	<div class="panel panel-primary">
+		<div class="panel-heading">Existing RI Score Data</div>
+		<div class="panel-body">
+		<form  action="/test-area-remove" method="get">
+			<table class="table table-bordered" id='ri-score-list-table'>							
+				<thead>								
+				<tr>
+					<th>Platform</th>
+					<th>Version</th>
+					<th>Sub Version</th>
+					<th>Score</th>
+					<th>Date</th>
+					<th>User</th>					
+					<th>Action</th>		
+				</tr>
+				</thead>					
+				<tbody>							
+				{% for item in ri_score_list %}
+				<tr>
+					<td>{{item.platform}}</td>
+					<td>{{item.version}}</td>
+					<td>{{item.sub_version}}</td>
+					<td>{{item.score}}</td>
+					<td>{{item.riscore_date}}</td>	
+					<td>{{item.user_id}}</td>						
+					<td>
+					<a class='btn btn-warning btn-sm' title='Edit' href="ri-score-edit?tid={{item['_id']}}"><span class='glyphicon glyphicon-edit' ></span> Edit</a>
+					<a class='btn btn-danger btn-sm' title='Delete' href="ri-score-remove?del_id={{item['_id']}}"><span class='glyphicon glyphicon-trash' ></span> Trash</a></td>					
+				</tr>						
+				{% endfor %}					
+			</table>				
+		</form>
+		</div>
+	</div>
+	</div>	
+				
+			</div>	
+            <!-- /.row -->
+        </div>
+        <!-- /#page-wrapper -->
+		
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>	
+<script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+<script>
+function validateTestareaForm() {
+
+	var test_area = document.getElementsByName('test_area')[0].value;
+	var user_id = document.getElementsByName('user_id')[0].value;
+	
+    if(test_area.trim()!="" && user_id.trim()!="") {
+		return true;
+    }else{
+	    alert("Please fill mandatory fields.")
+        document.getElementById('test_area').style.borderColor="#FF5733";
+		return false;	
+	}
+}
+
+
+$(document).ready(function() {
+
+	$('#ri-score-list-table').DataTable({  "columns": [
+    { "width": "10%" },
+    { "width": "10%"},
+    { "width": "10%"},
+    { "width": "10%"},
+    { "width": "15%"},
+    { "width": "15%"},
+    { "width": "15%"}
+  ]});
+} );	
+</script>		
+		
+{% include 'footer_new.html' %}		

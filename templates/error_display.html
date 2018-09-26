@@ -1,0 +1,15 @@
+<div class="col-lg-12">
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="panel panel-primary">
+				<div class="panel-body">	
+			{% for item in error %}
+				{% for s_key,s_value in item.items() %}
+				   <b>  {{s_key}}</b> : {{s_value}}<br>
+				{% endfor %}				
+			{% endfor %}
+				</div>			
+			</div>	
+		</div>			
+	</div>
+</div>

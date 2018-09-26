@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Regression Score Dashboard</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>  
+  
+</head>
+<body> 
+
+<style>
+.glyphicon.glyphicon-search {
+    font-size: 75px;
+}
+</style>
+{% if loggedin_user: %}
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/home">Regression Score</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li {{home_menu}}><a href="/home"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+      <li {{test_area_menu}}><a href="/test-area-management"><span class="glyphicon glyphicon-list-alt"></span> Test area</a></li>
+      <li {{reports_menu}}><a href="/reports"><span class="glyphicon glyphicon-print"></span> Reports</a></li>
+	  {% if loggedin_user =="jthanisl" %}
+		<li {{reports_menu}}><a href="/ri-score-management"><span class="glyphicon glyphicon-print"></span> RI Scores</a></li>
+      {% endif %}		  
+    </ul>
+	
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+    </ul>	
+  </div>
+</nav>
+{% endif %}
+
+<div class="container-fluid">				 
+
+            <div class="row">
+			
+				{% if error: %}			
+				<div class="col-lg-12">
+					<div class="alert alert-danger alert-dismissible fade in">
+						<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+						<strong>Danger!</strong> 	{% for item in error %}
+						{% for s_key,s_value in item.items() %}
+						<b>  {{s_key}}</b> : {{s_value}}<br>
+						{% endfor %}				
+						{% endfor %}
+					</div>		
+				</div>
+				{% else %}
+				
+                <div class="col-lg-12" style="padding-top:5px;">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+						
+			<form  action="/reports" method="post">
+		
+				<div class="col-md-3 text-left" style="padding-bottom:15px;">
+				  <label for="platform">Platform*:</label>
+				  <div>          
+						<select class="form-control" id="platform" name="platform" onchange="getVersions(this.value)">
+							<option value="">Select Platform</option>
+							
+							{% if search_dd_platform: %}
+								{% for item in search_dd_platform %}
+								    {% if selected_platform == item | lower():%}
+									<option value="{{item | lower()}}" selected >{{item | upper()}}</option> 
+									{% else %}
+									<option value="{{item | lower()}}">{{item | upper()}}</option> 
+									{% endif %}
+								{% endfor %}
+								
+								{% if selected_platform == "all":%}
+								<option value="all" selected>ALL</option>
+								{% else %}
+								<option value="all">ALL</option> 
+								{% endif %}
+								
+							{% endif %}	
+						</select>				
+					
+				  </div>
+				</div>				
+
+				
+				<div class="col-md-3 text-left">
+				  <label for="version">Version*:</label>
+				  <div>          
+						<select class="form-control" id="version" name="version" onchange="getSubVersions(this.value)">
+							<option value="">Select Version</option>					
+							{% if search_dd_version: %}
+								{% for item in search_dd_version %}
+								    {% if selected_version == item | lower():%}
+									<option value="{{item | lower()}}" selected >{{item}}</option> 
+									{% else %}
+									<option value="{{item | lower()}}">{{item}}</option> 
+									{% endif %}									
+								{% endfor %}
+
+								{% if selected_version == "all":%}
+								<option value="all" selected>ALL</option>
+								{% else %}
+								<option value="all">ALL</option> 
+								{% endif %}
+								
+							{% endif %}
+						</select>
+						<span id="version_info" style="color:red;font-size:14px;font-weight:bold;"></span>	
+				  </div>
+				</div>
+
+				<div class="col-md-3 text-left">
+				  <label for="sub_version">Sub-Version*:</label>
+				  <div>          
+						<select class="form-control" id="sub_version" name="sub_version">
+							<option value="">Select Sub Version</option>					
+							{% if search_dd_sub_version: %}
+								{% for item in search_dd_sub_version|sort %}
+								    {% if selected_sub_version == item | lower():%}
+									<option value="{{item | lower()}}" selected >{{item | upper()}}</option> 
+									{% else %}
+									<option value="{{item | lower()}}">{{item | upper()}}</option> 
+									{% endif %}									
+								{% endfor %}
+
+								{% if selected_sub_version == "all":%}
+								<option value="all" selected>ALL</option>
+								{% else %}
+								<option value="all">ALL</option> 
+								{% endif %}								
+							{% endif %}
+						</select>
+						<span id="sub_version_info" style="color:red;font-size:14px;font-weight:bold;"></span>	
+				  </div>
+				</div>	
+				
+			<div class="col-md-3 text-left">        
+			  <div style="padding-top:25px;">
+				<button type="submit" id="add_result_submit" onClick="return validateSearchForm();" class="btn btn-success">GET RI SCORE</button>
+				<a href="http://xr-bit.cisco.com/score" target="_blank" id="go-to-bit-score" class="btn btn-warning">Go To BIT Score</a>
+				
+				
+			  </div>	  
+			</div>					
+				
+			</form>	
+						
+						
+						</div>
+					</div>
+                </div>
+				
+<!-- After Search Form -->
+<!-- First row container -->
+				
+                <div class="col-lg-12">
+				<div class="row">				
+						<div class="col-lg-3">				
+							<div class="panel panel-default">								
+								<div class="panel-body" style="min-height:400px;overflow-x: scroll;">
+									<h4><span class="glyphicon glyphicon-th-list"></span> Latest Score</h4>
+									<table class="table table-striped" id="latest-score">
+										<thead>
+											<th>Platform</th>
+											<th>Score</th>
+											<th>Version</th>										
+										</thead>	
+										<tbody>
+											{% for ri_data in latest_score_data %}									
+												<tr>
+													<td>{{ri_data['platform']}}</td>
+													<td>{{ri_data['score']}}</td>
+													<td>{{ri_data['version']}} - {{ri_data['sub_version']}}</td>				
+													
+												</tr>
+											{% endfor %}
+										</tbody>
+									</table>						
+								</div>
+							</div>
+						</div>
+						
+						<div class="col-lg-6" style="overflow-x:scroll">						
+							
+							{% if trend_yaxis_data %}
+								<div id="main_report_comparison" style="min-width: {{trend_chart_width}}px; height: 400px; margin: 0 auto;"></div>
+							{% else %}
+							
+								<h4><i class="fa fa-line-chart" style="font-size:24px"></i> Platform Wise Trend</h4>
+								<span class="glyphicon glyphicon-search"></span> Coming Soon...
+								
+							{% endif %}
+							
+						</div>
+						
+						<div class="col-lg-3">				
+							<div class="panel panel-default">								
+								<div class="panel-body" style="min-height:400px;overflow-x: scroll;">
+									<h4><span class="glyphicon glyphicon-th-list"></span> Previous Score</h4>
+									<table class="table table-striped" id="previous-score">
+										<thead>
+											<th>Platform</th>
+											<th>Score</th>
+											<th>Version</th>											
+										</thead>	
+										<tbody>
+											{% for ri_data in previous_score_data %}									
+												<tr>
+													<td>{{ri_data['platform']}}</td>
+													<td>{{ri_data['score']}}</td>
+													<td>{{ri_data['version']}} - {{ri_data['sub_version']}}</td>												
+												</tr>
+											{% endfor %}
+										</tbody>
+									</table>						
+								</div>
+							</div>
+						</div>				
+
+						
+				</div>					
+                </div>
+		
+<!-- End : First row container -->	
+
+
+                <div class="col-lg-12">
+					<div class="row">					
+						<div class="col-lg-6">
+						
+							{% if component_wise %}									
+								<div id="ddts_component_wise" style="min-width: 280px; height: 350px; margin: 0 auto"></div>
+							{% else %}
+								<div class="panel panel-default">
+									<div class="panel-body">
+										<h4><i class="fa fa-bar-chart" style="font-size:24px"></i> Component Wise - DDTS</h4>
+										<span class="glyphicon glyphicon-search"></span> No records.
+									</div>
+								</div>								
+							{% endif %}							
+
+						</div>					
+
+
+						<div class="col-lg-6">							
+							{% if severity_wise %}									
+								<div id="ddts_severity_wise" style="min-width: 280px; height: 350px; margin: 0 auto"></div>
+							{% else %}
+								<div class="panel panel-default">
+									<div class="panel-body">
+										<h4><i class="fa fa-bar-chart" style="font-size:24px"></i> Severity Wise - DDTS</h4>
+										<span class="glyphicon glyphicon-search"></span> No records.
+									</div>
+								</div>								
+							{% endif %}	
+						</div>						
+						
+					</div>				
+				</div>
+				
+				<div class="col-lg-12">	
+				<!--	
+					<div class="panel panel-default">
+						<div class="panel-body"> -->
+						<h4><span class='glyphicon glyphicon-list' ></span> Consolidated DDTS Details</h4>
+							<table class="table table-bordered" id='bug-list-table'>
+								<thead>
+									<th>DDTS</th>
+									<th>Component</th>
+									<th>Status</th>
+									<th>Age</th>
+									<th>Headline</th>									
+								</thead>	
+								<tbody>
+									{% for cdets_info_item in cdets_info %}									
+										<tr>
+											<td><a href="http://cdetsweb-prd.cisco.com/apps/dumpcr?identifier={{cdets_info_item['Identifier']}}" target="_blank">{{cdets_info_item['Identifier']}}</a></td>
+											<td>{{cdets_info_item['Component']}}</td>
+											<td>{{cdets_info_item['Status']}}</td>											
+											<td>{{cdets_info_item['Age']}}</td>
+											<td>{{cdets_info_item['Headline']}}</td>											
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+							
+				<!--		</div>
+					</div> -->
+				</div>					
+				
+			{% endif %}		
+
+            {% if platform_wise_score_breakup %}
+			    {% set loopidx = 0 %}
+				{% for platform_key,platform_details in platform_wise_score_breakup.items() %}
+				    {% set loopidx = loopidx+1 %}
+				
+					{% for details in platform_details %}
+						<div class="col-lg-12">	
+							<h4><span class='glyphicon glyphicon-list' ></span> {{platform_key|upper}}</h4>
+							<p><b>Score :</b> {{details['score']|upper}} - <b>Version :</b> {{details['version']|upper}} ({{details['sub_version']|lower}})</p>
+							<table class="table table-bordered">
+								<thead>
+									<th>Score</th>
+									<th>Test Areas</th>
+									<th>DDTS</th>
+									<th>Impact</th>								
+								</thead>
+								
+								<tbody>
+									{% for platform_item in test_areas_for_breakup[platform_key]['break_up'] %}													
+										<tr>									
+											<td>{{platform_item['area_score']}}</td>
+											<td>{{platform_item['area_name']}}</td>										
+											<td>{{platform_item['ddts']}}</td>											
+											<td>{{platform_item['impact']}}</td>										
+										</tr>
+									{% endfor %}
+								</tbody>
+								
+							</table>
+						</div>						
+					{% endfor %}				
+					
+
+					<div class="col-lg-12">	
+						<h4><span class='glyphicon glyphicon-list' ></span> DDTS Info</h4>
+						
+						<table class="table table-bordered" id='bug-list-table-{{loop.index}}'>
+							<thead>
+								<th>DDTS</th>
+								<th>Component</th>
+								<th>Status</th>
+								<th>Age</th>
+								<th>Headline</th>									
+							</thead>	
+							<tbody>
+								{% for cdets_info_item in test_areas_for_breakup[platform_key]['ddts'] %}									
+									<tr>
+										<td><a href="http://cdetsweb-prd.cisco.com/apps/dumpcr?identifier={{cdets_info_item['Identifier']}}" target="_blank">{{cdets_info_item['Identifier']}}</a></td>
+										<td>{{cdets_info_item['Component']}}</td>
+										<td>{{cdets_info_item['Status']}}</td>											
+										<td>{{cdets_info_item['Age']}}</td>
+										<td>{{cdets_info_item['Headline']}}</td>											
+									</tr>
+								{% endfor %}
+							</tbody>
+							
+						</table>
+					</div>
+
+					
+				{% endfor %}				
+			{% endif %}		
+			
+			
+<!-- End : Second row container -->				
+				
+			</div>	
+            <!-- /.row -->
+        </div>
+        <!-- /#page-wrapper -->
+		
+		
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/no-data-to-display.js"></script>
+<script src="/static/js/reports.js?version={{timestr}}"></script>
+<script type="text/javascript">
+
+// Radialize the colors
+Highcharts.setOptions({
+    colors: Highcharts.map(Highcharts.getOptions().colors, function (color) {
+        return {
+            radialGradient: {
+                cx: 0.5,
+                cy: 0.3,
+                r: 0.7
+            },
+            stops: [
+                [0, color],
+                [1, Highcharts.Color(color).brighten(-0.3).get('rgb')] // darken
+            ]
+        };
+    })
+});
+</script>
+
+<script type="text/javascript">
+// Build the chart
+Highcharts.chart('ddts_component_wise', {
+    chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false,
+        type: 'pie'
+    },
+    title: {
+        text: 'Component Wise - DDTS'
+    },
+    tooltip: {
+        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+    },
+    plotOptions: {
+        pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+                enabled: true,
+                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                style: {
+                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                },
+                connectorColor: 'silver'
+            }
+        }
+    },
+    series: [{
+        name: 'Share',
+        data: {{component_wise | tojson}}
+    }]
+});
+
+</script>
+<script type="text/javascript">
+
+// Build the chart
+Highcharts.chart('ddts_severity_wise', {
+    chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false,
+        type: 'pie'
+    },
+    title: {
+        text: 'Severity Wise - DDTS'
+    },
+    tooltip: {
+        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+    },
+    plotOptions: {
+        pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+                enabled: true,
+                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                style: {
+                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                },
+                connectorColor: 'silver'
+            }
+        }
+    },
+    series: [{
+        name: 'Share',
+        data: {{severity_wise | tojson}}
+    }]
+});
+
+</script>
+
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>	
+<script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+<script>
+$(document).ready(function() {
+
+$("#platform").change(function () {
+
+	var selectedVersion = $("#version option:selected").val();
+	var selectedSub_version = $("#sub_version option:selected").val();	
+
+	platform_value = $(this).val();
+	if(platform_value=="all"){
+			if(selectedVersion=="all"){
+				$('#version').prop('selectedIndex',0);
+			}else{
+				$("#version").children("option[value='all']").hide();
+			}	
+	
+			if(selectedSub_version=="all"){
+				$('#sub_version').prop('selectedIndex',0);
+			}else{
+				$("#sub_version").children("option[value='all']").hide();
+			}	
+
+	}else{
+		$("#version").children("option[value='all']").show();
+		$("#sub_version").children("option[value='all']").show();	
+	}
+})
+$("#version").change(function () {
+
+	var selectedPlatform = $("#platform option:selected").val();
+	var selectedSub_version = $("#sub_version option:selected").val();	
+	//alert("selected Platform- " + selectedPlatform);
+	version_value = $(this).val();
+	if(version_value=="all"){
+			if(selectedPlatform=="all"){
+				$('#platform').prop('selectedIndex',0);
+			}else{
+				$("#platform").children("option[value='all']").hide();
+			}	
+	}else{
+			if(selectedSub_version=="all"){
+				$('#platform').prop('selectedIndex',0);
+			}else{
+				$("#platform").children("option[value='all']").show();
+			}		
+	}
+})
+$("#sub_version").change(function () {
+
+	var selectedPlatform = $("#platform option:selected").val();
+	var selectedVersion = $("#version option:selected").val();
+
+	sub_version_value = $(this).val();
+	if(sub_version_value=="all"){
+			if(selectedPlatform=="all"){
+				$('#platform').prop('selectedIndex',0);
+			}else{
+				$("#platform").children("option[value='all']").hide();
+			}
+	}else{
+			if(selectedVersion=="all" && selectedPlatform=="all"){
+				$('#platform').prop('selectedIndex',0);
+			}else{
+				$("#platform").children("option[value='all']").show();
+			}
+	}
+
+})
+
+
+	$('#latest-score').DataTable({
+		"columns": [
+			{ "width": "25%" },
+			{ "width": "25%"},
+			{ "width": "25%"}
+		],
+		"paging":   false,
+		"info":     false,
+		"searching": false 
+	});
+	
+	$('#previous-score').DataTable({
+		"columns": [
+			{ "width": "25%" },
+			{ "width": "25%"},
+			{ "width": "25%"}
+		],
+		"paging":   false,
+		"info":     false,
+		"searching": false 
+	});	
+	
+	
+
+	$('#bug-list-table').DataTable({  "columns": [
+	{ "width": "5%" },
+	{ "width": "5%"},
+	{ "width": "5%"},
+	{ "width": "5%"},
+	{ "width": "70%"}
+	],
+	"paging":   false,
+	"info":     false,
+	"searching": false 
+	});
+	
+	{% for platform_key,platform_details in platform_wise_score_breakup.items(): %}
+			$('#bug-list-table-{{loop.index}}').DataTable({  "columns": [
+			{ "width": "5%" },
+			{ "width": "5%"},
+			{ "width": "5%"},
+			{ "width": "5%"},
+			{ "width": "70%"}
+			],
+			"paging":   false,
+			"info":     false,
+			"searching": false 
+			});	
+	{% endfor %}
+  
+  
+} );	
+</script>
+
+
+<script type="text/javascript">
+
+Highcharts.chart('main_report_comparison', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: {{trend_chart_main_title|tojson}},
+		style: {
+			fontWeight: 'bold',
+			fontSize: '13px'			
+		}		
+    },
+    xAxis: {
+        categories: {{trend_xaxis_data|tojson}},
+        crosshair: true
+    },
+    yAxis: {
+        min: 0,
+		max:10,
+        title: {
+            text: 'Regression Score'
+        }
+    }
+	,
+    legend: {
+        enabled: {{trend_chart_legends|tojson}}
+    }
+	,
+    tooltip: {
+        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+            '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+        footerFormat: '</table>',
+        shared: true,
+        useHTML: true
+    },
+    plotOptions: {
+        column: {
+            pointPadding: 0.2,
+            borderWidth: 0,
+			pointWidth:22
+        }
+    },
+    series: {{trend_yaxis_data|tojson}}
+});
+		</script>		
+
+{% include 'footer_new.html' %}		

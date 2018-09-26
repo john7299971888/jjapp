@@ -1,0 +1,104 @@
+
+{% include 'header_new.html' %}	
+
+<div class="container-fluid">
+
+    <div class="row">
+	
+		{% if error: %}			
+		<div class="col-lg-12">
+			<div class="alert alert-danger alert-dismissible fade in">
+				<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+				<strong>Danger!</strong> 	{% for item in error %}
+				{% for s_key,s_value in item.items() %}
+				<b>  {{s_key}}</b> : {{s_value}}<br>
+				{% endfor %}				
+				{% endfor %}
+			</div>		
+		</div>	
+		{% endif %}		
+	
+		{% if user_message: %}			
+			<div class="col-lg-12">
+				<div class="alert alert-info alert-dismissible fade in">
+					<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+					<strong>Info! </strong> 	{{user_message}}
+				</div>		
+			</div>	
+		{% endif %}
+		
+		{% if editable_test_area %}
+			
+		<div class="col-lg-12">
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					Update Test Area
+				</div>
+				<!-- /.panel-heading -->
+				<div class="panel-body">				
+					<form  action="/test-area-update" method="post">
+					<input type="hidden" id="edit_id" name="edit_id" value="{{editable_test_area._id}}" >
+
+						<div class="col-md-12 text-left" style="padding-bottom:15px;">
+						  <label for="cafy_link">Editable Test Area*:</label>
+						  <div>          
+							<input type="text" class="form-control" id="test_area" name="test_area" value="{{editable_test_area.test_area}}" placeholder="Enter Your Test Area" required>
+						  </div>				
+						</div>
+
+						<div class="col-md-2 text-left" style="padding-bottom:15px;">
+						  <label for="user_id">Username*:</label>
+						  <div>          
+							<input type="text" class="form-control" id="user_id" name="user_id" value="{{loggedin_user}}" placeholder="CEC Id" readonly>
+						  </div>				
+						</div>			
+						
+						<div class="col-md-6 text-left">        
+						  <div style="padding-left:25px; padding-top:25px;">
+							<button type="submit" id="add_result_submit" onClick="return validateTestareaForm();" class="btn btn-success">Update</button>
+							<a href="/test-area-management" id="cancel-edit" class="btn btn-danger">Cancel</a>
+<span style="margin: 0px; padding: 0px; background: #ffffff; color: #e74c3c; box-shadow: 0px 0px; border: 0px solid #e74c3c;"><b><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Note: </b> All the fields marked as (*) are mandatory </span>													
+						  </div>
+  
+						</div>					
+						
+					</form>	
+					
+						
+						
+				</div>
+			</div>
+		</div>
+		{% else %}
+			<div class="col-lg-12">
+				<div class="panel panel-primary">
+					<div class="panel-body">
+						No such record to update. Please go to <i><a href="/test-area-management">Test Area Management</a></i> for further actions.
+					</div>
+				</div>
+			</div>		
+		{% endif %}
+
+
+	</div>	
+	<!-- /.row -->
+</div>
+<!-- /#page-wrapper -->
+
+<script>
+	function validateTestareaForm() {
+
+		var test_area = document.getElementsByName('test_area')[0].value;
+		var user_id = document.getElementsByName('user_id')[0].value;
+		
+		if(test_area.trim()!="" && user_id.trim()!="") {
+			return true;
+		}else{
+			alert("Please fill mandatory fields.")
+			document.getElementById('test_area').style.borderColor="#FF5733";
+			return false;	
+		}
+	}
+</script>		
+
+{% include 'footer_new.html' %}		

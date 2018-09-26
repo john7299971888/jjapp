@@ -1,0 +1,177 @@
+{% include 'header_new.html' %}	
+<script src="/static/js/home.js?version={{timestr}}"></script>
+<link href="/static/css/jquery-ui.css" rel="stylesheet">
+<div class="container-fluid">
+	<div class="row">			
+		{% if error: %}			
+		<div class="col-lg-12">
+			<div class="alert alert-danger alert-dismissible fade in">
+				<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+				<strong>Danger!</strong> 	
+				{% for item in error %}
+					{% for s_key,s_value in item.items() %}
+					<b>  {{s_key}}</b> : {{s_value}}<br>
+					{% endfor %}				
+				{% endfor %}
+			</div>		
+		</div>	
+		{% endif %}	
+
+		{% if input_success: %}			
+		<div class="col-lg-12">
+			<div class="alert alert-success alert-dismissible fade in">
+				<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+				<strong>Success!</strong> 	{{input_success}}
+			</div>		
+		</div>	
+		{% endif %}	
+
+	{% if user_message: %}			
+	<div class="col-lg-12">
+		<div class="alert alert-danger alert-dismissible fade in">
+			<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+			<strong>Info! </strong> 	{{user_message}}
+		</div>		
+	</div>	
+	{% endif %}					
+	
+	
+	<div class="col-lg-12">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				Dues Entry
+			</div>
+			<!-- /.panel-heading -->
+			<div class="panel-body">				
+
+			<form  action="/home" id="ri_score_data_form" method="post">
+			
+			<div class="col-md-2 text-left" style="padding-bottom:15px;">
+			  <label for="biller">Biller*:</label>
+			  <div>          
+					<select class="form-control" id="biller" name="biller" required>
+						<option value=""></option>					
+						<option value="axis credit card">AXIS Credit Card</option> 
+						<option value="axis loan">AXIS Loan</option> 				
+						<option value="bajaj loan">BAJAJ Loan</option> 				
+						<option value="citi credit card">CITI Credit Card</option> 							
+						<option value="hdfc credit card">HDFC Credit Card</option>
+						<option value="hdfc loan">HDFC Loan</option>				
+						<option value="hdfc cc loan">HDFC CC Loan</option>				
+						<option value="house rent">HOUSE Rent</option>
+						<option value="house electricity">HOUSE Electricity</option>				
+					</select>		
+			  </div>
+			</div>		
+				
+			<div class="col-md-2 text-left" style="padding-bottom:15px;">
+			  <label for="bill_amount">Due Amount*:</label>
+			  <div>          
+				<input type="number" class="form-control" id="bill_amount" name="bill_amount" min="0" step=".01" value="" placeholder="Amount" required>
+			  </div>				
+			</div>			
+		
+			<div class="col-sm-2 text-left">
+			  <label for="bill_date">Bill Date*:</label>
+			  <div>          
+				<input readonly type="text" size="17" class="form-control" id="bill_date" name="bill_date" value="{{today_date}}" placeholder="Billing date" required>
+			  </div>				
+			</div>				
+
+			<div class="col-sm-2 text-left">
+			  <label for="due_date">Due Date*:</label>
+			  <div>          
+				<input readonly type="text" size="17" class="form-control" id="due_date" name="due_date" value="{{today_date}}" placeholder="Due Date" required>
+			  </div>				
+			</div>	
+			
+			<div class="col-sm-2 text-left" style="padding-bottom:15px;">
+			  <label for="Status">Payment Status*:</label>
+			  <div>          
+					<select class="form-control" id="payment_status" name="payment_status" required>
+						<option value=""></option>					
+						<option value="paid" selected>PAID</option> 
+						<option value="pending">NOT PAID</option>
+					</select>	
+			  </div>
+			</div>	
+	
+			<div class="col-md-2 text-left">        
+			  <div>
+				<button type="submit" id="add_result_submit" onClick="return validateRIScoreInputForm();" class="btn btn-success">Submit</button>		
+			  </div>	  
+			</div>			
+		
+			</form>		
+	
+			</div>
+		</div>
+	</div>	
+
+	<div class="col-lg-12">
+	<div class="panel panel-primary">
+		<div class="panel-heading">Existing dues</div>
+		<div class="panel-body">
+			<table class="table table-bordered" id='dues-list-table'>							
+				<thead>								
+				<tr>
+					<th>Biller</th>
+					<th>Bill Amount</th>					
+					<th>Bill Date</th>
+					<th>Due Date</th>
+					<th>Actions</th>					
+				</tr>
+				</thead>					
+				<tbody>							
+				{% for item in dues_list %}
+				<tr>
+					<td>{{item.biller}}</td>
+					<td>{{item.bill_amount}}</td>					
+					<td>{{item.bill_date}}</td>
+					<td>{{item.due_date}}</td>
+					<td><a class='btn btn-success btn-sm' title='Edit' href="test-area-edit?tid={{item['_id']}}"><span class='glyphicon glyphicon-edit' ></span></a>
+					<a class='btn btn-danger btn-sm' title='Delete' href="test-area-remove?tid={{item['_id']}}"><span class='glyphicon glyphicon-trash' ></span></a>
+					</td>
+				</tr>						
+				{% endfor %}
+			
+			</table>				
+		</div>
+	</div>
+	</div>
+
+		
+	</div>
+  
+  
+</div>
+
+<script src="/static/vendor/jquery/jquery.min.js"></script>
+<script src="/static/vendor/bootstrap/js/bootstrap.min.js"></script>
+<script src="/static/js/jquery-ui.js"></script> 
+
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>	
+<script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+
+<script>
+function remove_this_tarea(tr_id){
+	$('tr#'+tr_id+'').remove();
+}
+
+$(document).ready(function() {
+
+	$('#dues-list-table').DataTable({  "columns": [
+    { "width": "20%" },
+    { "width": "20%"},
+    { "width": "20%"},
+    { "width": "20%"},	
+    { "width": "15%","orderable": false }
+  ],
+"paging":   false,
+
+"info":     false});
+} );	
+</script>	
+
+
+{% include 'footer_new.html' %}	
