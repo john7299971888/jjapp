@@ -1,0 +1,114 @@
+db.getCollection('ri_score').aggregate( [
+  {
+    $project: {
+      _id: 0,
+      platform: "$platform",
+      version: "$version",  
+      sub_version: "$sub_version",        
+      weekNumber: { $isoWeek: "$riscore_date" }
+    }
+  }
+] )
+
+==Order by name asc===================================================================================================================================
+
+	db.users.find({}).sort([("name", 1)])
+	db.users.find({}).sort([("name", 1),("date", -1)])  ==== One is ascending , One is descending
+	
+==Group by more than one column======================================================================================================================
+
+db.getCollection('ri_score').aggregate( [
+ 
+    {$group: {
+		_id: {platform:"$platform"}
+		}	  
+    }  
+] )	
+	
+==Group by more than one column======================================================================================================================
+
+db.getCollection('ri_score').aggregate( [
+ 
+    {$group: {
+		_id: {platform:"$platform",version:"$version",sub_version:"$sub_version"}
+		}	  
+    }  
+] )
+==$project operator equal to select in sql==========================================================================================================
+db.getCollection('ri_score').aggregate([
+        {'$project': {
+            'platform': 1,
+            'version': 1,
+            'sub_version': 1,			
+            '_id': 0,			
+            'attribute': 1,			
+            'sub_attribute': 1
+        }}
+    ])
+==Latest record group by platform=========================================================================================================================================
+db.getCollection('ri_score').aggregate([
+
+		{ "$sort": { "riscore_date": -1 } },
+
+		{ "$group": {
+			"_id": "$platform",
+			"results": {
+				"$push": {
+					"platform": "$platform",			
+					"version": "$version", 
+					"sub_version": "$sub_version",
+					"riscore_date": "$riscore_date",				
+					"score": "$score"
+				}
+			},
+			"latest": { 
+				"$first": {
+					"platform": "$platform",			
+					"version": "$version", 
+					"sub_version": "$sub_version",
+					"riscore_date": "$riscore_date",				
+					"score": "$score"
+				}
+			}
+		}},
+		{'$project': {
+			'platform': '$_id.platform',
+			'_id': 0,
+			'latest':1,
+			'platform':"$latest.platform",
+			'version':"$latest.version",
+			'sub_version':"$latest.sub_version",
+			'date':"$latest.riscore_date",
+			'score':"$latest.score"
+			
+		}}	
+	
+])
+================================================================================================================================================
+
+db.getCollection('bug_data').aggregate([
+    {$group: {
+        _id: {bugid: "$Identifier"},
+        uniqueIds: {$addToSet: "$_id"},
+        count: {$sum: 1}
+        }
+    },
+    {$match: { 
+        count: {"$gt": 1}
+        }
+    }
+]);
+
+===Having count greater than one================================================================================================================
+
+db.getCollection('bug_data').aggregate([{
+  '$group': {
+    '_id': {'Identifier': '$Identifier'}, 
+    'count': {'$sum': 1}, 
+    'data': {'$addToSet': '$$ROOT'}}
+}, {
+  '$match': {
+    'count': {'$gt': 1}
+}}])
+
+================================================================================================================================================

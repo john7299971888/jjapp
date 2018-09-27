@@ -1,6 +1,6 @@
 function validateRIScoreInputForm_Update() {
 
-// Mandatory columns : platform/version/sub_version/riscore_date/attribute/ri_score
+   //Mandatory columns : platform/version/sub_version/riscore_date/attribute/ri_score
     borderColorEmpty();
 	var platform     = document.getElementById('platform').value;
 	var version      = document.getElementById('version').value;
@@ -80,7 +80,7 @@ function borderColorEmpty(){
 
 
 $( function() {
-	$( "#riscore_date" ).datepicker({
+	$( "#bill_date" ).datepicker({
 		showAnim: 'slide',
 		showOn: "button",
 		buttonImage: "/static/images/calendar.gif",
@@ -88,6 +88,16 @@ $( function() {
 		buttonText: "Select date",
 		dateFormat: 'mm/dd/yy'		
 	});	
+
+	$( "#due_date" ).datepicker({
+		showAnim: 'slide',
+		showOn: "button",
+		buttonImage: "/static/images/calendar.gif",
+		buttonImageOnly: true,
+		buttonText: "Select date",
+		dateFormat: 'mm/dd/yy'		
+	});	
+	
 });
 
 function IsValidID(cdets,element_name){

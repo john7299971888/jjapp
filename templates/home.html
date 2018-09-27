@@ -1,6 +1,35 @@
-{% include 'header_new.html' %}	
-<script src="/static/js/home.js?version={{timestr}}"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>JJAPP</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>  
+</head>
+<body>  
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/home">JJ APP</a>
+    </div>
+    <ul class="nav navbar-nav">
+		<li {{home_menu}}><a href="/home"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+		<li {{ri_scores_menu}}><a href="/loan-int-management"><span class="glyphicon glyphicon-list-alt"></span> Loan Int Mgt</a></li>			
+		<li {{reports_menu}}><a href="/reports"><span class="glyphicon glyphicon-print"></span> Reports</a></li>
+    </ul>
+	
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+    </ul>	
+  </div>
+</nav>
 
+
+<script src="/static/js/home.js?version={{timestr}}"></script>
 <link href="/static/css/jquery-ui.css" rel="stylesheet">
 <style>
 .due-pending{
@@ -65,7 +94,8 @@ color:green;
 				<option value="hdfc loan">HDFC Loan</option>				
 				<option value="hdfc cc loan">HDFC CC Loan</option>				
                 <option value="house rent">HOUSE Rent</option>
-                <option value="house electricity">HOUSE Electricity</option>				
+                <option value="house electricity">HOUSE Electricity</option>
+                <option value="daily expenses">Daily Expenses</option>				
 			</select>				
 		
 	  </div>
@@ -118,6 +148,31 @@ color:green;
 				</div>
 			</div>
 		</div>	
+		
+		
+		
+	<div class="col-lg-12">
+	<div class="panel panel-primary">
+		<div class="panel-body">
+			<table class="table table-bordered">							
+				<thead>								
+				<tr>
+					<th>Payment Status</th>
+					<th>Bill Amount</th>					
+				</tr>
+				</thead>					
+				<tbody>							
+				{% for item in dues_summary %}
+				<tr>
+					<td>{{item.payment}}</td>
+					<td>{{item.bill_amount}}</td>
+				</tr>						
+				{% endfor %}
+			
+			</table>				
+		</div>
+	</div>
+	</div>		
 
 	<div class="col-lg-12">
 	<div class="panel panel-primary">
@@ -139,8 +194,8 @@ color:green;
 					<td>{{item.bill_amount}}</td>					
 					<td>{{item.payment_status}}</td>
 					<td>{{item.due_date}}</td>
-					<td><a class='btn btn-success btn-sm' title='Edit' href="test-area-edit?tid={{item['_id']}}"><span class='glyphicon glyphicon-edit' ></span></a>
-					<a class='btn btn-danger btn-sm' title='Delete' href="test-area-remove?tid={{item['_id']}}"><span class='glyphicon glyphicon-trash' ></span></a>
+					<td><a class='btn btn-success btn-sm' title='Edit' href="dues-edit?tid={{item['_id']}}"><span class='glyphicon glyphicon-edit' ></span></a>
+					<a class='btn btn-danger btn-sm' title='Delete' href="dues-remove?del_id={{item['_id']}}"><span class='glyphicon glyphicon-trash' ></span></a>
 					</td>
 				</tr>						
 				{% endfor %}

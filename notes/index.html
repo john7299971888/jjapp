@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+ 
+<div class="container">
+
+  <div class="panel panel-default">
+    <div class="panel-heading">check the existence of a variable</div>
+    <div class="panel-body">
+		<b>To check the existence of a local variable:	</b><br>
+		if 'myVar' in locals():<br>
+		  # myVar exists.<br><br>
+		  
+		<b>To check the existence of a global variable:</b><br>
+
+		if 'myVar' in globals():<br>
+		  # myVar exists.<br><br>
+		  
+		<b>To check if an object has an attribute:</b><br>
+
+		if hasattr(obj, 'attr_name'):<br>
+		  # obj.attr_name exists.<br>
+	
+	</div>
+  </div>
+  
+   <div class="panel panel-default">
+    <div class="panel-heading">Python Upgrade</div>
+    <div class="panel-body">
+		Upgrade python package with particular version :
+		================================================
+		sudo pip install --upgrade openpyxl==2.5
+		================================================
+		# For Linux/OS X
+		pip install -U pip setuptools
+
+		# For Windows
+		python -m pip install -U pip setuptools
+		================================================	
+	</div>
+  </div> 
+  
+   <div class="panel panel-default">
+    <div class="panel-heading">Python Upgrade</div>
+    <div class="panel-body">
+		>>> L = [0, 23, 234, 89, None, 0, 35, 9]
+		>>> [x for x in L if x is not None]
+		[0, 23, 234, 89, 0, 35, 9]	
+	</div>
+  </div> 
+  
+
+</div>
+</body>
+</html>

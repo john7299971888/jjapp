@@ -1,34 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Regression Score Dashboard</title>
+  <title>JJAPP</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">  
+  
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>  
-  
 </head>
-<body> 
-
+<body onload="getReportsOnPageLoad()"> 
 <style>
 .glyphicon.glyphicon-search {
     font-size: 75px;
 }
-</style>
-{% if loggedin_user: %}
+</style> 
 <nav class="navbar navbar-default">
   <div class="container-fluid">
     <div class="navbar-header">
-      <a class="navbar-brand" href="/home">Regression Score</a>
+      <a class="navbar-brand" href="/home">JJ APP</a>
     </div>
     <ul class="nav navbar-nav">
 		<li {{home_menu}}><a href="/home"><span class="glyphicon glyphicon-home"></span> Home</a></li>
-		<li {{reports_menu}}><a href="/ri-score-management"><span class="glyphicon glyphicon-list-alt"></span> RI Scores</a></li>			
-		<li {{test_area_menu}}><a href="/test-area-management"><span class="glyphicon glyphicon-list-alt"></span> Test area</a></li>  
-		<li {{reports_menu}}><a href="/reports"><span class="glyphicon glyphicon-print"></span> Reports</a></li>	  
+		<li {{ri_scores_menu}}><a href="/loan-int-management"><span class="glyphicon glyphicon-list-alt"></span> Loan Int Mgt</a></li>			
+		<li {{reports_menu}}><a href="/reports"><span class="glyphicon glyphicon-print"></span> Reports</a></li>
     </ul>
 	
     <ul class="nav navbar-nav navbar-right">
@@ -36,115 +32,56 @@
     </ul>	
   </div>
 </nav>
-{% endif %}
+
+
 
 <div class="container-fluid">				 
 
-            <div class="row">
-			
-				{% if error: %}			
-				<div class="col-lg-12">
-					<div class="alert alert-danger alert-dismissible fade in">
-						<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-						<strong>Danger!</strong> 	{% for item in error %}
-						{% for s_key,s_value in item.items() %}
-						<b>  {{s_key}}</b> : {{s_value}}<br>
-						{% endfor %}				
-						{% endfor %}
-					</div>		
-				</div>
-				{% else %}
-				
-                <div class="col-lg-12" style="padding-top:5px;">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
+	<div class="row">
+
+		{% if error: %}			
+		<div class="col-lg-12">
+			<div class="alert alert-danger alert-dismissible fade in">
+				<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+				<strong>Danger!</strong> 	{% for item in error %}
+				{% for s_key,s_value in item.items() %}
+				<b>  {{s_key}}</b> : {{s_value}}<br>
+				{% endfor %}				
+				{% endfor %}
+			</div>		
+		</div>
+		{% else %}
+		
+		<div class="col-lg-12" style="padding-top:5px;">
+			<div class="panel panel-default">
+				<div class="panel-body">
 						
 			<form  action="/reports" method="post">
 		
 				<div class="col-md-3 text-left" style="padding-bottom:15px;">
-				  <label for="platform">Platform*:</label>
+				  <label for="Biller">Biller*:</label>
 				  <div>          
-						<select class="form-control" id="platform" name="platform" onchange="getVersions(this.value)">
-							<option value="">Select Platform</option>
-							
-							{% if search_dd_platform: %}
-								{% for item in search_dd_platform %}
-								    {% if selected_platform == item | lower():%}
-									<option value="{{item | lower()}}" selected >{{item | upper()}}</option> 
-									{% else %}
-									<option value="{{item | lower()}}">{{item | upper()}}</option> 
-									{% endif %}
-								{% endfor %}
-								
-								{% if selected_platform == "all":%}
-								<option value="all" selected>ALL</option>
-								{% else %}
-								<option value="all">ALL</option> 
-								{% endif %}
-								
-							{% endif %}	
-						</select>				
+						<select class="form-control" id="biller" name="biller" required>
+							<option value=""></option>					
+							<option value="axis credit card">AXIS Credit Card</option> 
+							<option value="axis loan">AXIS Loan</option> 				
+							<option value="bajaj loan">BAJAJ Loan</option> 				
+							<option value="citi credit card">CITI Credit Card</option> 							
+							<option value="hdfc credit card">HDFC Credit Card</option>
+							<option value="hdfc loan">HDFC Loan</option>				
+							<option value="hdfc cc loan">HDFC CC Loan</option>				
+							<option value="house rent">HOUSE Rent</option>
+							<option value="house electricity">HOUSE Electricity</option>
+							<option value="daily expenses">Daily Expenses</option>				
+						</select>						
+						
 					
-				  </div>
-				</div>				
-
-				
-				<div class="col-md-3 text-left">
-				  <label for="version">Version*:</label>
-				  <div>          
-						<select class="form-control" id="version" name="version" onchange="getSubVersions(this.value)">
-							<option value="">Select Version</option>					
-							{% if search_dd_version: %}
-								{% for item in search_dd_version %}
-								    {% if selected_version == item | lower():%}
-									<option value="{{item | lower()}}" selected >{{item}}</option> 
-									{% else %}
-									<option value="{{item | lower()}}">{{item}}</option> 
-									{% endif %}									
-								{% endfor %}
-
-								{% if selected_version == "all":%}
-								<option value="all" selected>ALL</option>
-								{% else %}
-								<option value="all">ALL</option> 
-								{% endif %}
-								
-							{% endif %}
-						</select>
-						<span id="version_info" style="color:red;font-size:14px;font-weight:bold;"></span>	
-				  </div>
-				</div>
-
-				<div class="col-md-3 text-left">
-				  <label for="sub_version">Sub-Version*:</label>
-				  <div>          
-						<select class="form-control" id="sub_version" name="sub_version">
-							<option value="">Select Sub Version</option>					
-							{% if search_dd_sub_version: %}
-								{% for item in search_dd_sub_version|sort %}
-								    {% if selected_sub_version == item | lower():%}
-									<option value="{{item | lower()}}" selected >{{item | upper()}}</option> 
-									{% else %}
-									<option value="{{item | lower()}}">{{item | upper()}}</option> 
-									{% endif %}									
-								{% endfor %}
-
-								{% if selected_sub_version == "all":%}
-								<option value="all" selected>ALL</option>
-								{% else %}
-								<option value="all">ALL</option> 
-								{% endif %}								
-							{% endif %}
-						</select>
-						<span id="sub_version_info" style="color:red;font-size:14px;font-weight:bold;"></span>	
 				  </div>
 				</div>	
 				
 			<div class="col-md-3 text-left">        
 			  <div style="padding-top:25px;">
-				<button type="submit" id="add_result_submit" onClick="return validateSearchForm();" class="btn btn-success">GET RI SCORE</button>
-				<a href="http://xr-bit.cisco.com/score" target="_blank" id="go-to-bit-score" class="btn btn-warning">Go To BIT Score</a>
-				
+				<button id="add_result_submit" onClick="return getReportsAjax();" class="btn btn-success">GET BILL</button>		
 				
 			  </div>	  
 			</div>					
@@ -152,227 +89,34 @@
 			</form>	
 						
 						
-						</div>
-					</div>
-                </div>
-				
+			</div>
+		</div>
+	</div>
+{% endif %}				
 <!-- After Search Form -->
 <!-- First row container -->
+
+    <div id="reports_container">
+	
+	</div> <!-- End : reports_container -->
 			
-                <div class="col-lg-12">
-				<div class="row">				
-						<div class="col-lg-3">				
-							<div class="panel panel-default">								
-								<div class="panel-body" style="min-height:400px;overflow-x: scroll;">
-									<h4><span class="glyphicon glyphicon-th-list"></span> Latest Score</h4>
-									<table class="table table-striped" id="latest-score">
-										<thead>
-											<th>Platform</th>
-											<th>Score</th>
-											<th>Version</th>										
-										</thead>	
-										<tbody>
-											{% for ri_data in latest_score_data %}									
-												<tr>
-													<td>{{ri_data['platform']}}</td>
-													<td>{{ri_data['score']}}</td>
-													<td>{{ri_data['version']}} - {{ri_data['sub_version']}}</td>				
-													
-												</tr>
-											{% endfor %}
-										</tbody>
-									</table>						
-								</div>
-							</div>
-						</div>
-						
-						<div class="col-lg-6" style="overflow-x:scroll">						
-							
-							{% if trend_chart_score_data %}
-								<div id="trend_chart" style="min-width: {{trend_chart_width_new}}px; height: 400px; margin: 0 auto;"></div> 
-							{% else %}							
-								<h4><i class="fa fa-line-chart" style="font-size:24px"></i> Platform Wise Trend</h4>
-								<span class="glyphicon glyphicon-search"></span> Coming Soon...								
-							{% endif %}		
-							
-							
-						</div>
-						
-						<div class="col-lg-3">				
-							<div class="panel panel-default">								
-								<div class="panel-body" style="min-height:400px;overflow-x: scroll;">
-									<h4><span class="glyphicon glyphicon-th-list"></span> Previous Score</h4>
-									<table class="table table-striped" id="previous-score">
-										<thead>
-											<th>Platform</th>
-											<th>Score</th>
-											<th>Version</th>											
-										</thead>	
-										<tbody>
-											{% for ri_data in previous_score_data %}									
-												<tr>
-													<td>{{ri_data['platform']}}</td>
-													<td>{{ri_data['score']}}</td>
-													<td>{{ri_data['version']}} - {{ri_data['sub_version']}}</td>												
-												</tr>
-											{% endfor %}
-										</tbody>
-									</table>						
-								</div>
-							</div>
-						</div>				
-
-						
-				</div>					
-                </div>
-		
-<!-- End : First row container -->	
-
-
-                <div class="col-lg-12">
-					<div class="row">					
-						<div class="col-lg-6">
-						
-							{% if component_wise %}									
-								<div id="ddts_component_wise" style="min-width: 280px; height: 350px; margin: 0 auto"></div>
-							{% else %}
-								<div class="panel panel-default">
-									<div class="panel-body">
-										<h4><i class="fa fa-bar-chart" style="font-size:24px"></i> Component Wise - DDTS</h4>
-										<span class="glyphicon glyphicon-search"></span> No records.
-									</div>
-								</div>								
-							{% endif %}							
-
-						</div>					
-
-
-						<div class="col-lg-6">							
-							{% if severity_wise %}									
-								<div id="ddts_severity_wise" style="min-width: 280px; height: 350px; margin: 0 auto"></div>
-							{% else %}
-								<div class="panel panel-default">
-									<div class="panel-body">
-										<h4><i class="fa fa-bar-chart" style="font-size:24px"></i> Severity Wise - DDTS</h4>
-										<span class="glyphicon glyphicon-search"></span> No records.
-									</div>
-								</div>								
-							{% endif %}	
-						</div>						
-						
-					</div>				
-				</div>
-				
-				<div class="col-lg-12">	
-				<!--	
-					<div class="panel panel-default">
-						<div class="panel-body"> -->
-						<h4><span class='glyphicon glyphicon-list' ></span> Consolidated DDTS Details</h4>
-							<table class="table table-bordered" id='bug-list-table'>
-								<thead>
-									<th>DDTS</th>
-									<th>Component</th>
-									<th>Status</th>
-									<th>Age</th>
-									<th>Headline</th>									
-								</thead>	
-								<tbody>
-									{% for cdets_info_item in cdets_info %}									
-										<tr>
-											<td><a href="http://cdetsweb-prd.cisco.com/apps/dumpcr?identifier={{cdets_info_item['Identifier']}}" target="_blank">{{cdets_info_item['Identifier']}}</a></td>
-											<td>{{cdets_info_item['Component']}}</td>
-											<td>{{cdets_info_item['Status']}}</td>											
-											<td>{{cdets_info_item['Age']}}</td>
-											<td>{{cdets_info_item['Headline']}}</td>											
-										</tr>
-									{% endfor %}
-								</tbody>
-							</table>
-							
-				<!--		</div>
-					</div> -->
-				</div>					
-				
-			{% endif %}		
-
-            {% if platform_wise_score_breakup %}
-			    {% set loopidx = 0 %}
-				{% for platform_key,platform_details in platform_wise_score_breakup.items() %}
-				    {% set loopidx = loopidx+1 %}
-				
-					{% for details in platform_details %}
-						<div class="col-lg-12">	
-							<h4><span class='glyphicon glyphicon-list' ></span> {{platform_key|upper}}</h4>
-							<p><b>Score :</b> {{details['score']|upper}} - <b>Version :</b> {{details['version']|upper}} ({{details['sub_version']|lower}})</p>
-							<table class="table table-bordered">
-								<thead>
-									<th>Score</th>
-									<th>Test Areas</th>
-									<th>DDTS</th>
-									<th>Impact</th>								
-								</thead>
-								
-								<tbody>
-									{% for platform_item in test_areas_for_breakup[platform_key]['break_up'] %}													
-										<tr>									
-											<td>{{platform_item['area_score']}}</td>
-											<td>{{platform_item['area_name']}}</td>										
-											<td>{{platform_item['ddts']}}</td>											
-											<td>{{platform_item['impact']}}</td>										
-										</tr>
-									{% endfor %}
-								</tbody>
-								
-							</table>
-						</div>						
-					{% endfor %}				
-					
-
-					<div class="col-lg-12">	
-						<h4><span class='glyphicon glyphicon-list' ></span> DDTS Info</h4>
-						
-						<table class="table table-bordered" id='bug-list-table-{{loop.index}}'>
-							<thead>
-								<th>DDTS</th>
-								<th>Component</th>
-								<th>Status</th>
-								<th>Age</th>
-								<th>Headline</th>									
-							</thead>	
-							<tbody>
-								{% for cdets_info_item in test_areas_for_breakup[platform_key]['ddts'] %}									
-									<tr>
-										<td><a href="http://cdetsweb-prd.cisco.com/apps/dumpcr?identifier={{cdets_info_item['Identifier']}}" target="_blank">{{cdets_info_item['Identifier']}}</a></td>
-										<td>{{cdets_info_item['Component']}}</td>
-										<td>{{cdets_info_item['Status']}}</td>											
-										<td>{{cdets_info_item['Age']}}</td>
-										<td>{{cdets_info_item['Headline']}}</td>											
-									</tr>
-								{% endfor %}
-							</tbody>
-							
-						</table>
-					</div>
-
-					
-				{% endfor %}				
-			{% endif %}		
-			
-			
-<!-- End : Second row container -->				
 				
 			</div>	
             <!-- /.row -->
         </div>
         <!-- /#page-wrapper -->
 		
-		
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
-<script src="https://code.highcharts.com/modules/export-data.js"></script>
-<script src="https://code.highcharts.com/modules/no-data-to-display.js"></script>
-<script src="/static/js/reports.js?version={{timestr}}"></script>
-<script src="/static/js/trend_chart_group.js?version={{timestr}}"></script>
+<script src="/static/js/jquery.dataTables.min.js"></script>	
+<script src="/static/js/dataTables.bootstrap.min.js"></script>	
+
+<script src="/static/js/highcharts/highcharts.js"></script>
+<script src="/static/js/highcharts/exporting.js"></script>
+<script src="/static/js/highcharts/export-data.js"></script>
+<script src="/static/js/highcharts/no-data-to-display.js"></script> 
+ 
+<script src="/static/js/reports_new.js?version={{timestr}}"></script> 
+<script src="/static/js/trend_chart_group.js?version={{timestr}}"></script>		
+
 
 <script type="text/javascript">
 
@@ -392,84 +136,10 @@ Highcharts.setOptions({
         };
     })
 });
-</script>
-
-<script type="text/javascript">
-// Build the chart
-Highcharts.chart('ddts_component_wise', {
-    chart: {
-        plotBackgroundColor: null,
-        plotBorderWidth: null,
-        plotShadow: false,
-        type: 'pie'
-    },
-    title: {
-        text: 'Component Wise - DDTS'
-    },
-    tooltip: {
-        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-    },
-    plotOptions: {
-        pie: {
-            allowPointSelect: true,
-            cursor: 'pointer',
-            dataLabels: {
-                enabled: true,
-                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
-                style: {
-                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-                },
-                connectorColor: 'silver'
-            }
-        }
-    },
-    series: [{
-        name: 'Share',
-        data: {{component_wise | tojson}}
-    }]
-});
-
-</script>
-<script type="text/javascript">
-
-// Build the chart
-Highcharts.chart('ddts_severity_wise', {
-    chart: {
-        plotBackgroundColor: null,
-        plotBorderWidth: null,
-        plotShadow: false,
-        type: 'pie'
-    },
-    title: {
-        text: 'Severity Wise - DDTS'
-    },
-    tooltip: {
-        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-    },
-    plotOptions: {
-        pie: {
-            allowPointSelect: true,
-            cursor: 'pointer',
-            dataLabels: {
-                enabled: true,
-                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
-                style: {
-                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-                },
-                connectorColor: 'silver'
-            }
-        }
-    },
-    series: [{
-        name: 'Share',
-        data: {{severity_wise | tojson}}
-    }]
-});
 
 </script>
 
-<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>	
-<script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+
 <script>
 $(document).ready(function() {
 
@@ -538,57 +208,6 @@ $("#sub_version").change(function () {
 	}
 
 })
-
-
-	$('#latest-score').DataTable({
-		"columns": [
-			{ "width": "25%" },
-			{ "width": "25%"},
-			{ "width": "25%"}
-		],
-		"paging":   false,
-		"info":     false,
-		"searching": false 
-	});
-	
-	$('#previous-score').DataTable({
-		"columns": [
-			{ "width": "25%" },
-			{ "width": "25%"},
-			{ "width": "25%"}
-		],
-		"paging":   false,
-		"info":     false,
-		"searching": false 
-	});	
-	
-	
-
-	$('#bug-list-table').DataTable({  "columns": [
-	{ "width": "5%" },
-	{ "width": "5%"},
-	{ "width": "5%"},
-	{ "width": "5%"},
-	{ "width": "70%"}
-	],
-	"paging":   false,
-	"info":     false,
-	"searching": false 
-	});
-	
-	{% for platform_key,platform_details in platform_wise_score_breakup.items(): %}
-			$('#bug-list-table-{{loop.index}}').DataTable({  "columns": [
-			{ "width": "5%" },
-			{ "width": "5%"},
-			{ "width": "5%"},
-			{ "width": "5%"},
-			{ "width": "70%"}
-			],
-			"paging":   false,
-			"info":     false,
-			"searching": false 
-			});	
-	{% endfor %}
   
   
 } );	
@@ -597,78 +216,57 @@ $("#sub_version").change(function () {
 
 <script type="text/javascript">
 
-Highcharts.chart('trend_chart', {
-    chart: {
-        renderTo: "chart",
-        type: "column"
-    },
-	legend:{enabled:false},	
-    title: {
-        text: {{trend_chart_main_title|tojson}},
-		style: {
-			fontWeight: 'bold',
-			fontSize: '13px'			
-		}		
-    },	
-    tooltip: {
-        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-        pointFormat: '<tr><td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
-        footerFormat: '</table>',
-        shared: true,
-        useHTML: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0,
-			pointWidth:22
-        }
-    },
-    yAxis: {
-        min: 0,
-		max:10,
-        title: {
-            text: 'Regression Score'
-        }
-    },
-    xAxis: {
-		labels: {
-            enabled: {{trend_chart_new_legends|tojson}},		
-			groupedOptions: [{
-				style: {
-				    fontSize: '14px',
-					fontWeight:'bold',					
-					color: 'red' // set red font for labels in 1st-Level  
-				},
-				rotation: {{categories_rotation|tojson}}
-			}],
-			rotation: 0,
-			// 0-level options aren't changed, use them as always,
-			style: {
-                fontFamily: 'Verdana, sans-serif',
-				fontWeight:'bold',
-				color: 'green' // set red font for labels in 1st-Level  
-			}			
-		},	
-        categories: {{trend_chart_categories|tojson}}
-    },	
-    series: [{
-        data: {{trend_chart_score_data|tojson}},
-		dataLabels: {
-            enabled: true,
-			rotation: -90,
-            color: '#FFFFFF',
-            align: 'right',
-            format: '{point.y:.1f}', // one decimal
-            y: 5, // 10 pixels down from the top
-            style: {
-                fontSize: '13px',
-                fontFamily: 'Verdana, sans-serif'
-            }
-        } 
-    }]
-});
+function getReportsAjax(){
+    $("#reports_container").html("");
+	var biller = document.getElementById("biller").value;
+    alert(biller);
+    $("#reports_container").html('Please wait...<img src="/static/images/loading-gears.gif">');
+    if(biller.trim()=="") {
+	    $("#reports_container").html('<div class="col-lg-12"><div class="alert alert-danger alert-dismissible fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Danger! </strong> Please give at least one input to search.</div></div>');
+		return false;	
+    }else{	
+		$("#biller").attr("disabled",true);	
+		$("#add_result_submit").attr("disabled",'disabled');	
+			
+		$("#reports_container").html('<div style="padding-left:400px;align:center;"><p>Please wait...<img src="/static/images/loading-gears.gif"></p></div>');		
+		$.ajax({
+			url: '/getReportsAjax',
+			data: 'biller='+biller.trim(),
+			type: 'POST',
+			success: function(response){
+			
+				$("#reports_container").html(response);				
+				$("#biller").attr("disabled",false);	
+				$("#add_result_submit").attr("disabled", false);		
+			},
+			error: function(error) {
+				console.log(error);
+				$("#reports_container").html("<br>"+error);			
+			}
+		});
+	}
+	
+}
 
+function getReportsOnPageLoad(){
+	$("#biller").attr("disabled",true);		
+	$("#add_result_submit").attr("disabled",'disabled');
+	$("#reports_container").html('<div style="padding-left:400px;align:center;"><p>Please wait...<img src="/static/images/loading-gears.gif"></p></div>');		
+	$.ajax({
+		url: '/getReportsAjax',
+		data: 'biller=all',
+		type: 'POST',
+		success: function(response){		
+			$("#reports_container").html(response);			
+			$("#biller").attr("disabled",false);
+			$("#add_result_submit").attr("disabled", false);		
+		},
+		error: function(error) {
+			console.log(error);
+			$("#reports_container").html("<br>"+error);			
+		}
+	});	
+}
 
 </script>		
 
