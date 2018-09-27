@@ -227,7 +227,7 @@ def loan_int_management():
             update_db_result = entity_collection.dues.update({'_id': ObjectId(edit_id)},{'$set':form_input_array})
             if update_db_result['nModified'] == 1:
                 session['loan-details-user-message'] = 'Loan details modified successfully.'
-            loan_int_list=entity_collection.loan_int_mgt.find({})         
+            loan_int_list=entity_collection.loan_details.find({})         
         except:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             etype_value = (traceback.format_exception_only(exc_type, exc_value))[0] 
@@ -237,7 +237,7 @@ def loan_int_management():
     else:
         try:
             entity_collection = db_connection()
-            loan_int_list=entity_collection.loan_int_mgt.find({})
+            loan_int_list=entity_collection.loan_details.find({})
             loan_int_list_array = []
             p_os_total = 0
             int_month_total = 0            
@@ -284,7 +284,7 @@ def loan_details_edit():
         try:
             tid = request.args['tid']
             entity_collection = db_connection()
-            edit_db_result = entity_collection.loan_int_mgt.find({'_id': ObjectId(tid)})
+            edit_db_result = entity_collection.loan_details.find({'_id': ObjectId(tid)})
             if edit_db_result.count() == 0 :
                 user_message = 'Record is not in database'
             else:
@@ -314,7 +314,7 @@ def loan_details_update():
             edit_id = request.form['edit_id']
             p_os = float(request.form['p_os'].strip())           
             update_data = {'p_os':p_os,'updated_on':datetime.datetime.now()}
-            update_db_result = entity_collection.loan_int_mgt.update({'_id': ObjectId(edit_id)},{'$set':update_data})
+            update_db_result = entity_collection.loan_details.update({'_id': ObjectId(edit_id)},{'$set':update_data})
             if update_db_result['nModified'] == 1:
                 session['loan-details-user-message'] = 'Loan Details modified successfully.'
         except:
@@ -604,7 +604,7 @@ def getSubVersionsForDropDown():
     
     return dd_values     
 
-@app.route('/regression-backup')
+@app.route('/jjapp-backup')
 def dbbackup_router():
     home_menu = ''
     test_area_menu = 'class=active'
@@ -626,8 +626,8 @@ def dbbackup_router():
 
         backup_date_list=list(set(backup_date_list))
         if today_date not in backup_date_list:
-            riscore_results_db_records = entity_collection.ri_score.find({})
-            testarea_db_records = entity_collection.test_area.find({})
+            riscore_results_db_records = entity_collection.dues.find({})
+            testarea_db_records = entity_collection.loan_details.find({})
 
             riscore_results = []
             for result in riscore_results_db_records:
@@ -638,11 +638,11 @@ def dbbackup_router():
                 json_testarea.append(result)
 
             results_data = json.dumps(riscore_results, default=json_util.default)
-            with open(fileRoot+"/db/riscores_"+today_date+".json","w") as f:
+            with open(fileRoot+"/db/dues_"+today_date+".json","w") as f:
                 f.write(results_data)
 
             urls_data = json.dumps(json_testarea, default=json_util.default)
-            with open(fileRoot+"/db/testareas_"+today_date+".json","w") as f:
+            with open(fileRoot+"/db/loan_details_"+today_date+".json","w") as f:
                 f.write(urls_data)
 
             dirs = os.listdir( fileRoot+"/db" )
@@ -654,7 +654,7 @@ def dbbackup_router():
         error_list.append({'File name and line number':tb1})
 
     if 'regression-tool-username' in session:
-        return render_template('regression-db-backup.html', file_list=dirs, loggedin_user = session['regression-tool-username'], error = error_list, home_menu = home_menu, test_area_menu = test_area_menu, reports_menu = reports_menu)
+        return render_template('db-backup.html', file_list=dirs, loggedin_user = session['regression-tool-username'], error = error_list, home_menu = home_menu, test_area_menu = test_area_menu, reports_menu = reports_menu)
     else:
         return redirect(url_for('login'))
 
